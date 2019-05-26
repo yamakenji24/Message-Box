@@ -3,12 +3,22 @@ class MessageBox extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      messages: [
-        { id: 1, user: 'Tom',   text: 'Good morning' },
-        { id: 2, user: 'John',  text: 'Good afternoon' },
-        { id: 3, user: 'Emily', text: 'Good evening' }
-      ]
+      messages: []
     }
+  }
+
+  componentDidMount() {
+    $.ajax({
+      url: this.props.url,
+      dataType: 'json',
+      cache: false,
+      success: function(messages) {
+        this.setState({ messages: messages});
+      }.bind(this),
+      eror: function(_xhr, status, err) {
+        console.error(this.props.url, status, err.toString());
+      }.bind(this)
+    });
   }
   
   handleMessageSubmit(message) {
