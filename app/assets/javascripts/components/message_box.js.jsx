@@ -10,7 +10,13 @@ class MessageBox extends React.Component {
       ]
     }
   }
-
+  
+  handleMessageSubmit(message) {
+    message.id = new Date();
+    var newMessage = this.state.messages.concat(message);
+    this.setState({messages: newMessage});
+  }
+  
   render() {
     var messageItems = this.state.messages.map(function(message){
       return (
@@ -21,6 +27,7 @@ class MessageBox extends React.Component {
     return (
       <div className="messageBox">
         {messageItems}
+        <MessageForm onMessageSubmit={this.handleMessageSubmit.bind(this)} />
       </div>
     );
   }
