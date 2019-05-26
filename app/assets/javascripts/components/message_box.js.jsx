@@ -3,7 +3,8 @@ class MessageBox extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      messages: []
+      messages: [],
+      isLoading: true
     }
   }
 
@@ -13,7 +14,7 @@ class MessageBox extends React.Component {
       dataType: 'json',
       cache: false,
       success: function(messages) {
-        this.setState({ messages: messages});
+        this.setState({ messages: messages, isLoading: false });
       }.bind(this),
       eror: function(_xhr, status, err) {
         console.error(this.props.url, status, err.toString());
@@ -22,9 +23,19 @@ class MessageBox extends React.Component {
   }
   
   handleMessageSubmit(message) {
-    message.id = new Date();
-    var newMessage = this.state.messages.concat(message);
-    this.setState({messages: newMessage});
+    $.ajax({
+      url: this.props.url,
+      dataType: 'json',
+      type: 'POST',
+      data: message,
+      success: function(message) {
+        var newMessage = this.state.messages.concat(message);
+        this.setState({messages: newMessage});
+      }.bind(this),
+      error: function(_xhr, status, err) {
+        console.error(this.props.url, status, err.toString());
+      }.bind(this)
+    });
   }
   
   render() {
@@ -34,12 +45,18 @@ class MessageBox extends React.Component {
       );
     });
 
-    return (
-      <div className="messageBox">
-        {messageItems}
-        <MessageForm onMessageSubmit={this.handleMessageSubmit.bind(this)} />
-      </div>
-    );
+    if(this.state.isLoading) {
+      return (
+        <div>ロード中</div>
+      );
+    } else {
+      return (
+          <div className="messageBox">
+            {messageItems}
+            <MessageForm onMessageSubmit={this.handleMessageSubmit.bind(this)} />
+          </div>
+      );
+    }
   }
 }
 
